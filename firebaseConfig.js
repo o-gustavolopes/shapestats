@@ -3,7 +3,7 @@ import { getFirestore } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyAP6wbGMS0gmQOrM1OCXYjPLrqtnEw4-5o",
+  apiKey: "key",
   authDomain: "shapestats.firebaseapp.com",
   projectId: "shapestats",
   storageBucket: "shapestats.firebasestorage.app",
