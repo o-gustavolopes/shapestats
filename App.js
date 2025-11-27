@@ -19,7 +19,6 @@ export default function App() {
 
   if (loading) return null;
 
-  // RootStack sempre carregado — ele decide internamente
   return (
     <NavigationContainer>
       <RootStack />

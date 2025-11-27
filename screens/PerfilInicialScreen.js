@@ -14,7 +14,7 @@ export default function PerfilInicialScreen({ navigation, route }) {
     const entrarNoApp = () => {
         navigation.reset({
             index: 0,
-            routes: [{ name: "AppTabs" }], // volta para o root -> AppTabs
+            routes: [{ name: "AppTabs" }],
         });
     };
 

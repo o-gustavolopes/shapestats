@@ -14,7 +14,6 @@ export default function LoginScreen({ navigation }) {
     try {
       await signInWithEmailAndPassword(auth, email.trim(), senha);
 
-      // 🔥 ESSA ERA A LINHA QUE FALTAVA
       navigation.replace("AppTabs");
       
     } catch (e) {

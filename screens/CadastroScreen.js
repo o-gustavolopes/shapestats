@@ -56,7 +56,6 @@ export default function CadastroScreen({ navigation }) {
         </Text>
       </TouchableOpacity>
 
-      {/* BOTÃO: Já tenho conta */}
       <TouchableOpacity
         onPress={() => navigation.navigate("Login")}
         style={{ marginTop: 20 }}
