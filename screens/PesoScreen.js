@@ -19,8 +19,10 @@ import {
   query,
   orderBy,
   serverTimestamp,
+  where,
 } from "firebase/firestore";
-import { db } from "../firebaseConfig";
+
+import { db, auth } from "../firebaseConfig";
 
 export default function PesoScreen() {
   const [peso, setPeso] = React.useState("");
@@ -31,39 +33,35 @@ export default function PesoScreen() {
   const [confirmType, setConfirmType] = React.useState(null);
   const [targetId, setTargetId] = React.useState(null);
 
+  const uid = auth.currentUser?.uid;
   const pesosRef = collection(db, "pesos");
 
-  React.useEffect(() => {
-    const carregar = async () => {
-      try {
-        const q = query(pesosRef, orderBy("createdAt", "desc"));
-        const snapshot = await getDocs(q);
+  const carregarLista = async () => {
+    try {
+      if (!uid) return;
 
-        const lista = snapshot.docs.map((doc) => ({
-          id: doc.id,
-          ...doc.data(),
-        }));
+      const q = query(
+        pesosRef,
+        where("uid", "==", uid),
+        orderBy("createdAt", "desc")
+      );
 
-        setRegistros(lista);
-      } catch (err) {
-        console.log("Erro ao carregar:", err);
-      }
-    };
+      const snapshot = await getDocs(q);
 
-    carregar();
-  }, []);
+      const lista = snapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
 
-  const recarregarLista = async () => {
-    const q = query(pesosRef, orderBy("createdAt", "desc"));
-    const snapshot = await getDocs(q);
-
-    const lista = snapshot.docs.map((doc) => ({
-      id: doc.id,
-      ...doc.data(),
-    }));
-
-    setRegistros(lista);
+      setRegistros(lista);
+    } catch (err) {
+      console.log("Erro ao carregar lista:", err);
+    }
   };
+
+  React.useEffect(() => {
+    carregarLista();
+  }, [uid]);
 
   const salvarPeso = async () => {
     const valor = parseFloat(String(peso).replace(",", "."));
@@ -76,6 +74,7 @@ export default function PesoScreen() {
         setEditingId(null);
       } else {
         await addDoc(pesosRef, {
+          uid,
           valor,
           data: new Date().toLocaleDateString("pt-BR"),
           createdAt: serverTimestamp(),
@@ -83,7 +82,7 @@ export default function PesoScreen() {
       }
 
       setPeso("");
-      recarregarLista();
+      carregarLista();
     } catch (err) {
       console.log("Erro ao salvar:", err);
     }
@@ -122,7 +121,9 @@ export default function PesoScreen() {
       }
 
       if (confirmType === "limpar") {
-        const snap = await getDocs(pesosRef);
+        const snap = await getDocs(
+          query(pesosRef, where("uid", "==", uid))
+        );
         const promises = snap.docs.map((d) => deleteDoc(d.ref));
         await Promise.all(promises);
         cancelarEdicao();
@@ -132,7 +133,7 @@ export default function PesoScreen() {
       setConfirmType(null);
       setTargetId(null);
 
-      recarregarLista();
+      carregarLista();
     } catch (err) {
       console.log("Erro:", err);
     }
@@ -143,6 +144,14 @@ export default function PesoScreen() {
     setConfirmType(null);
     setTargetId(null);
   };
+
+  if (!uid) {
+    return (
+      <View style={styles.screen}>
+        <Text>Carregando usuário...</Text>
+      </View>
+    );
+  }
 
   return (
     <View style={styles.screen}>
@@ -207,12 +216,14 @@ export default function PesoScreen() {
             <Text style={styles.itemText}>
               {item.data} — {Number(item.valor).toFixed(1)} kg
             </Text>
+
             <View style={{ flexDirection: "row", gap: 12 }}>
               <TouchableOpacity onPress={() => iniciarEdicao(item)}>
                 <Text style={{ color: "#2e86de", fontWeight: "600" }}>
                   Editar
                 </Text>
               </TouchableOpacity>
+
               <TouchableOpacity
                 onPress={() => pedirConfirmacaoExcluir(item.id)}
               >

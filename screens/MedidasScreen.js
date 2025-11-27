@@ -18,10 +18,11 @@ import {
   getDocs,
   query,
   orderBy,
+  where,
   serverTimestamp,
 } from "firebase/firestore";
 
-import { db } from "../firebaseConfig";
+import { auth, db } from "../firebaseConfig";
 
 export default function MedidasScreen() {
   const [cintura, setCintura] = React.useState("");
@@ -43,7 +44,15 @@ export default function MedidasScreen() {
 
   const recarregarLista = async () => {
     try {
-      const q = query(medidasRef, orderBy("createdAt", "desc"));
+      const uid = auth.currentUser?.uid;
+      if (!uid) return;
+
+      const q = query(
+        medidasRef,
+        where("uid", "==", uid),
+        orderBy("createdAt", "desc")
+      );
+
       const snapshot = await getDocs(q);
 
       const lista = snapshot.docs.map((d) => ({
@@ -63,7 +72,11 @@ export default function MedidasScreen() {
   };
 
   const salvarMedidas = async () => {
+    const uid = auth.currentUser?.uid;
+    if (!uid) return;
+
     const reg = {
+      uid,
       cintura: toNum(cintura),
       peito: toNum(peito),
       braco: toNum(braco),
@@ -109,7 +122,7 @@ export default function MedidasScreen() {
     setEditingId(null);
     limparCampos();
   };
-  
+
   const pedirConfirmacaoExcluir = (id) => {
     setConfirmType("excluir");
     setTargetId(id);
@@ -126,16 +139,23 @@ export default function MedidasScreen() {
 
   const confirmarAcao = async () => {
     try {
+      const uid = auth.currentUser?.uid;
+      if (!uid) return;
+
       if (confirmType === "excluir" && targetId) {
         const ref = doc(db, "medidas", targetId);
         await deleteDoc(ref);
+
         if (editingId === targetId) cancelarEdicao();
       }
 
       if (confirmType === "limpar") {
-        const snap = await getDocs(medidasRef);
+        const q = query(medidasRef, where("uid", "==", uid));
+        const snap = await getDocs(q);
+
         const promises = snap.docs.map((d) => deleteDoc(d.ref));
         await Promise.all(promises);
+
         cancelarEdicao();
       }
 

@@ -20,24 +20,22 @@ export default function AppTabs() {
         tabBarLabelStyle: { fontSize: 12 },
         tabBarStyle: Platform.select({
           web: {
-            position: "fixed",
+            position: "absolute",
             left: 0,
             right: 0,
             bottom: 0,
             height: 56,
             borderTopWidth: 0,
             backgroundColor: "#f8f9fa",
-            shadowColor: "#000",
-            shadowOpacity: 0.06,
-            shadowRadius: 6,
-            shadowOffset: { width: 0, height: -1 },
-            zIndex: 10,
+            boxShadow: "0px -1px 6px rgba(0,0,0,0.06)",
+            zIndex: 10, 
           },
           default: {
             backgroundColor: "#f8f9fa",
             borderTopColor: "#eaeaea",
           },
         }),
+
         tabBarIcon: ({ color, size }) => {
           let iconName;
 
