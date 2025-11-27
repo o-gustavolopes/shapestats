@@ -70,11 +70,18 @@ export default function PerfilScreen({ navigation }) {
   const sair = async () => {
     try {
       await signOut(auth);
-      navigation.replace("Login");
+      navigation.reset({
+        index: 0,
+        routes: [{ name: "AuthStack", state: { routes: [{ name: "Login" }] } }],
+      });
+
     } catch (e) {
       console.log("Erro ao sair:", e);
     }
   };
+
+
+
 
   return (
     <ScrollView contentContainerStyle={styles.screen}>

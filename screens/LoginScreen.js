@@ -9,8 +9,14 @@ export default function LoginScreen({ navigation }) {
   const [erro, setErro] = useState("");
 
   const login = async () => {
+    setErro("");
+
     try {
-      await signInWithEmailAndPassword(auth, email, senha);
+      await signInWithEmailAndPassword(auth, email.trim(), senha);
+
+      // 🔥 ESSA ERA A LINHA QUE FALTAVA
+      navigation.replace("AppTabs");
+      
     } catch (e) {
       setErro("Email ou senha inválidos");
     }
@@ -24,7 +30,14 @@ export default function LoginScreen({ navigation }) {
         placeholder="Email"
         value={email}
         onChangeText={setEmail}
-        style={{ backgroundColor: "#fff", padding: 12, marginVertical: 10 }}
+        autoCapitalize="none"
+        keyboardType="email-address"
+        style={{
+          backgroundColor: "#fff",
+          padding: 12,
+          marginVertical: 10,
+          borderRadius: 8,
+        }}
       />
 
       <TextInput
@@ -32,18 +45,43 @@ export default function LoginScreen({ navigation }) {
         secureTextEntry
         value={senha}
         onChangeText={setSenha}
-        style={{ backgroundColor: "#fff", padding: 12, marginVertical: 10 }}
+        style={{
+          backgroundColor: "#fff",
+          padding: 12,
+          marginVertical: 10,
+          borderRadius: 8,
+        }}
       />
 
-      {erro ? <Text style={{ color: "red" }}>{erro}</Text> : null}
+      {erro ? (
+        <Text style={{ color: "red", marginBottom: 10 }}>{erro}</Text>
+      ) : null}
 
-      <TouchableOpacity onPress={login} style={{ backgroundColor: "#2e86de", padding: 14, borderRadius: 8 }}>
-        <Text style={{ color: "white", textAlign: "center", fontWeight: "bold" }}>
+      <TouchableOpacity
+        onPress={login}
+        style={{
+          backgroundColor: "#2e86de",
+          padding: 14,
+          borderRadius: 8,
+          marginTop: 10,
+        }}
+      >
+        <Text
+          style={{
+            color: "white",
+            textAlign: "center",
+            fontWeight: "bold",
+            fontSize: 16,
+          }}
+        >
           Entrar
         </Text>
       </TouchableOpacity>
 
-      <TouchableOpacity onPress={() => navigation.navigate("Cadastro")} style={{ marginTop: 20 }}>
+      <TouchableOpacity
+        onPress={() => navigation.navigate("Cadastro")}
+        style={{ marginTop: 20, alignSelf: "center" }}
+      >
         <Text style={{ color: "#2e86de" }}>Criar conta</Text>
       </TouchableOpacity>
     </View>

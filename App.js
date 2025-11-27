@@ -1,10 +1,9 @@
+import React, { useEffect, useState } from "react";
 import { NavigationContainer } from "@react-navigation/native";
 import { onAuthStateChanged } from "firebase/auth";
-import { useEffect, useState } from "react";
 import { auth } from "./firebaseConfig";
 
-import AuthStack from "./navigation/AuthStack";
-import AppTabs from "./navigation/AppTabs";
+import RootStack from "./navigation/RootStack";
 
 export default function App() {
   const [user, setUser] = useState(null);
@@ -15,15 +14,15 @@ export default function App() {
       setUser(u);
       setLoading(false);
     });
-
     return unsub;
   }, []);
 
   if (loading) return null;
 
+  // RootStack sempre carregado — ele decide internamente
   return (
     <NavigationContainer>
-      {user ? <AppTabs /> : <AuthStack />}
+      <RootStack />
     </NavigationContainer>
   );
 }
